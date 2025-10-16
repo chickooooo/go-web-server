@@ -1,4 +1,4 @@
-[ ] Setup env (add port)
+[x] Setup env (add port)
 [ ] Add 404 response
 
 [ ] Properly log error message
