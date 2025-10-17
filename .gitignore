@@ -1,1 +1,5 @@
+# environments
 .env
+
+# test coverage
+coverage.out

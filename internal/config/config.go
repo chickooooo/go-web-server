@@ -13,9 +13,9 @@ type Config struct {
 }
 
 // LoadConfig loads environment variables and returns a Config struct
-func LoadConfig() *Config {
+func LoadConfig(envPath string) *Config {
 	// Load environment variables
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(envPath); err != nil {
 		log.Println("No .env file found, using default values")
 	}
 

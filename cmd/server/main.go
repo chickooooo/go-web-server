@@ -8,18 +8,29 @@ import (
 	"github.com/chickooooo/go-web-server/internal/config"
 )
 
-func main() {
+// Start web server
+func StartServer(
+	configLoader func(string) *config.Config,
+	routeInitializer func(*http.ServeMux),
+	listenAndServe func(string, http.Handler) error,
+) {
 	// Load project config
-	cfg := config.LoadConfig()
+	cfg := configLoader(".env")
 
-	// Create a server multiplexer
+	// Create a server multiplexer & initialise routes
 	mux := http.NewServeMux()
-
-	// Initialize API routes
-	api.InitializeRoutes(mux)
+	routeInitializer(mux)
 
 	// Start the server
 	fmt.Printf("HTTP server started at port %s\n", cfg.ServerPort)
 	serverAddress := fmt.Sprintf(":%s", cfg.ServerPort)
-	http.ListenAndServe(serverAddress, mux)
+	listenAndServe(serverAddress, mux)
+}
+
+func main() {
+	StartServer(
+		config.LoadConfig,
+		api.InitializeRoutes,
+		http.ListenAndServe,
+	)
 }
