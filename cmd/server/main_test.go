@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/chickooooo/go-web-server/internal/api"
 	"github.com/chickooooo/go-web-server/internal/config"
 )
 
@@ -26,10 +27,13 @@ func TestStartServer(t *testing.T) {
 	}
 
 	// Mock route initializer
-	mockRouteInitializer := func(mux *http.ServeMux) {
+	mockRouteInitializer := func(mux *http.ServeMux, handlerSet *api.HandlerSet) {
 		routesCalled = true
 		if mux == nil {
 			t.Error("expected non-nil mux")
+		}
+		if handlerSet == nil {
+			t.Error("expected non-nil handlerSet")
 		}
 	}
 

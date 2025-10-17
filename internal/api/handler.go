@@ -14,6 +14,12 @@ type HealthResponse struct {
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	// Healthy response
-	response := HealthResponse{Status: "Healthy!"}
+	response := HealthResponse{Status: "Healthy"}
 	WriteJSON(w, http.StatusOK, response)
+}
+
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+	// Not found response
+	response := ErrorResponse{Message: "Not found"}
+	WriteJSON(w, http.StatusNotFound, response)
 }

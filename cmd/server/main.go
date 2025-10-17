@@ -11,7 +11,7 @@ import (
 // Start web server
 func StartServer(
 	configLoader func(string) *config.Config,
-	routeInitializer func(*http.ServeMux),
+	routeInitializer func(*http.ServeMux, *api.HandlerSet),
 	listenAndServe func(string, http.Handler) error,
 ) {
 	// Load project config
@@ -19,7 +19,8 @@ func StartServer(
 
 	// Create a server multiplexer & initialise routes
 	mux := http.NewServeMux()
-	routeInitializer(mux)
+	handlerSet := api.NewHandlerSet()
+	routeInitializer(mux, handlerSet)
 
 	// Start the server
 	fmt.Printf("HTTP server started at port %s\n", cfg.ServerPort)
