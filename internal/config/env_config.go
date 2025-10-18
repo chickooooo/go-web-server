@@ -7,19 +7,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config contains project configurations
-type Config struct {
+// EnvConfig contains project environment configurations
+type EnvConfig struct {
 	ServerPort string
 }
 
-// LoadConfig loads environment variables and returns a Config struct
-func LoadConfig(envPath string) *Config {
+// LoadEnvConfig loads environment variables and returns a EnvConfig struct
+func LoadEnvConfig(envPath string) *EnvConfig {
 	// Load environment variables
 	if err := godotenv.Load(envPath); err != nil {
 		log.Println("No .env file found, using default values")
 	}
 
-	return &Config{
+	return &EnvConfig{
 		ServerPort: getEnv("SERVER_PORT", "8080"),
 	}
 }

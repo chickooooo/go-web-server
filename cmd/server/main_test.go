@@ -11,17 +11,17 @@ import (
 // TestStartServer verifies that config loading, route initialization, and server start are invoked
 func TestStartServer(t *testing.T) {
 	// Flags to verify function calls
-	configCalled := false
+	envConfigCalled := false
 	routesCalled := false
 	serverCalled := false
 
 	// Mock config loader
-	mockConfigLoader := func(envPath string) *config.Config {
-		configCalled = true
+	mockEnvConfigLoader := func(envPath string) *config.EnvConfig {
+		envConfigCalled = true
 		if envPath != ".env" {
 			t.Errorf("expected envPath '.env', got '%s'", envPath)
 		}
-		return &config.Config{
+		return &config.EnvConfig{
 			ServerPort: "1234",
 		}
 	}
@@ -51,11 +51,11 @@ func TestStartServer(t *testing.T) {
 	}
 
 	// Act
-	StartServer(mockConfigLoader, mockRouteInitializer, mockListenAndServe)
+	StartServer(mockEnvConfigLoader, mockRouteInitializer, mockListenAndServe)
 
 	// Assert
-	if !configCalled {
-		t.Error("expected config loader to be called")
+	if !envConfigCalled {
+		t.Error("expected env config loader to be called")
 	}
 	if !routesCalled {
 		t.Error("expected route initializer to be called")

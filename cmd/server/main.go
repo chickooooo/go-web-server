@@ -10,12 +10,12 @@ import (
 
 // Start web server
 func StartServer(
-	configLoader func(string) *config.Config,
+	envConfigLoader func(string) *config.EnvConfig,
 	routeInitializer func(*http.ServeMux, *api.HandlerSet),
 	listenAndServe func(string, http.Handler) error,
 ) {
 	// Load project config
-	cfg := configLoader(".env")
+	envConfig := envConfigLoader(".env")
 
 	// Create a server multiplexer & initialise routes
 	mux := http.NewServeMux()
@@ -23,14 +23,14 @@ func StartServer(
 	routeInitializer(mux, handlerSet)
 
 	// Start the server
-	fmt.Printf("HTTP server started at port %s\n", cfg.ServerPort)
-	serverAddress := fmt.Sprintf(":%s", cfg.ServerPort)
+	fmt.Printf("HTTP server started at port %s\n", envConfig.ServerPort)
+	serverAddress := fmt.Sprintf(":%s", envConfig.ServerPort)
 	listenAndServe(serverAddress, mux)
 }
 
 func main() {
 	StartServer(
-		config.LoadConfig,
+		config.LoadEnvConfig,
 		api.InitializeRoutes,
 		http.ListenAndServe,
 	)

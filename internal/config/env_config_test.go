@@ -46,7 +46,7 @@ func TestLoadConfig_DefaultValues(t *testing.T) {
 	expected := "8080"
 
 	// Act
-	cfg := LoadConfig(nonExistentPath)
+	cfg := LoadEnvConfig(nonExistentPath)
 
 	// Assert
 	if cfg.ServerPort != expected {
@@ -62,7 +62,7 @@ func TestLoadConfig_ValuesFromEnv(t *testing.T) {
 	defer os.Unsetenv("SERVER_PORT")
 
 	// Act
-	cfg := LoadConfig("non-existent.env") // we don't need a real .env file; env var is already set
+	cfg := LoadEnvConfig("non-existent.env") // we don't need a real .env file; env var is already set
 
 	// Assert
 	if cfg.ServerPort != expected {
