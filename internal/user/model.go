@@ -6,16 +6,20 @@ import (
 	"time"
 )
 
+// CreateUser model is used to create a new user
 type CreateUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// UserDTO model is a subset of User model.
+// It defines the public fields of User model
 type UserDTO struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 }
 
+// Core User model
 type User struct {
 	ID        int
 	Username  string

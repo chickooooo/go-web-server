@@ -17,6 +17,7 @@ var (
 	handlersOnce sync.Once
 )
 
+// GetHandlers initializes and returns all the handlers
 func GetHandlers() *Handlers {
 	handlersOnce.Do(func() {
 		GolangJWTRepo := jwt.NewJWTRepository()
