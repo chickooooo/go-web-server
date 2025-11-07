@@ -4,22 +4,35 @@ import (
 	"time"
 
 	"example.com/config"
-	"example.com/internal/user"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 type jwtRepository struct{}
 
+// NewJWTRepository create and returns new JWT Repository
 func NewJWTRepository() Repository {
 	return &jwtRepository{}
 }
 
-func newToken(u *user.User, duration time.Duration) (string, error) {
+// Claims defines the structure for JWT claims
+type Claims struct {
+	TokenData
+	jwt.RegisteredClaims
+}
+
+// newToken generates new token that will contain tokenData.
+// duration define the TTL of the token.
+func newToken(td *TokenData, duration time.Duration) (string, error) {
 	// Generate token claims
-	claims := jwt.MapClaims{
-		"user_id": u.ID,
-		"exp":     time.Now().Add(duration).Unix(),
-		"iat":     time.Now().Unix(),
+	now := time.Now()
+	claims := Claims{
+		TokenData: TokenData{
+			UserID: td.UserID,
+		},
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
+		},
 	}
 
 	// Sign token
@@ -32,15 +45,16 @@ func newToken(u *user.User, duration time.Duration) (string, error) {
 	return signedToken, nil
 }
 
-func (repo *jwtRepository) NewTokens(u *user.User) (*JWTTokens, error) {
+// NewTokens generate and returns new JWT token pair
+func (repo *jwtRepository) NewTokens(td *TokenData) (*JWTTokens, error) {
 	// New access token
-	accessToken, err := newToken(u, config.Constants.JWTAccessDuration)
+	accessToken, err := newToken(td, config.Constants.JWTAccessDuration)
 	if err != nil {
 		return nil, err
 	}
 
 	// New refresh token
-	refreshToken, err := newToken(u, config.Constants.JWTRefreshDuration)
+	refreshToken, err := newToken(td, config.Constants.JWTRefreshDuration)
 	if err != nil {
 		return nil, err
 	}
@@ -51,10 +65,27 @@ func (repo *jwtRepository) NewTokens(u *user.User) (*JWTTokens, error) {
 	}, nil
 }
 
-func (repo *jwtRepository) VerifyToken(accessToken string) error {
-	return nil
-}
+// VerifyToken verifies the given tokenStr. Returns the encoded token data
+func (repo *jwtRepository) VerifyToken(tokenStr string) (*TokenData, error) {
+	// Parse the token with a key lookup function
+	token, err := jwt.ParseWithClaims(
+		tokenStr,
+		&Claims{},
+		func(token *jwt.Token) (any, error) {
+			// Ensure the signing method is HMAC and expected
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, jwt.ErrTokenInvalidClaims
+			}
+			return config.Environments.JWTSecret, nil
+		})
+	if err != nil {
+		return nil, err
+	}
 
-func (repo *jwtRepository) RefreshTokens(accessToken string) *JWTTokens {
-	return nil
+	// Extract and validate claims
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return &claims.TokenData, nil
+	}
+
+	return nil, jwt.ErrTokenInvalidClaims
 }

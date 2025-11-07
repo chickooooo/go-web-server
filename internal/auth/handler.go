@@ -25,6 +25,7 @@ func NewHandler(jwtService jwt.Service, userService user.Service) Handler {
 	}
 }
 
+// Register creates a new user, generate JWT tokens for that user and returns them
 func (h handler) Register(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var cu user.CreateUser
@@ -61,7 +62,10 @@ func (h handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate JWT tokens
-	tokens, err := h.jwtService.NewTokens(user)
+	tokenData := jwt.TokenData{
+		UserID: user.ID,
+	}
+	tokens, err := h.jwtService.NewTokens(&tokenData)
 	if err != nil {
 		response := core.ErrorResponse{
 			Message: "Error generating tokens",

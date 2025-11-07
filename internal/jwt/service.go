@@ -1,11 +1,9 @@
 package jwt
 
-import "example.com/internal/user"
-
 type Service interface {
-	NewTokens(u *user.User) (*JWTTokens, error)
-	VerifyToken(accessToken string) error
-	RefreshTokens(accessToken string) *JWTTokens
+	NewTokens(td *TokenData) (*JWTTokens, error)
+	VerifyToken(tokenStr string) (*TokenData, error)
+	RefreshTokens(refreshToken string) (*JWTTokens, error)
 }
 
 type service struct {
@@ -18,14 +16,25 @@ func NewService(repo Repository) Service {
 	}
 }
 
-func (s *service) NewTokens(u *user.User) (*JWTTokens, error) {
-	return s.repo.NewTokens(u)
+// NewTokens generate and returns new JWT token pair
+func (s *service) NewTokens(td *TokenData) (*JWTTokens, error) {
+	return s.repo.NewTokens(td)
 }
 
-func (s *service) VerifyToken(accessToken string) error {
-	return s.repo.VerifyToken(accessToken)
+// VerifyToken verifies the given tokenStr. Returns the encoded token data
+func (s *service) VerifyToken(tokenStr string) (*TokenData, error) {
+	return s.repo.VerifyToken(tokenStr)
 }
 
-func (s *service) RefreshTokens(accessToken string) *JWTTokens {
-	return s.RefreshTokens(accessToken)
+// RefreshTokens validates the given refreshToken.
+// If the token is valid, it returns a new JWT token pair
+func (s *service) RefreshTokens(refreshToken string) (*JWTTokens, error) {
+	// Verify refresh token
+	tokenData, err := s.repo.VerifyToken(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	// Generate and return new access & refreh tokens
+	return s.repo.NewTokens(tokenData)
 }
