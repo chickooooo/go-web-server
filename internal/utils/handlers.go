@@ -3,13 +3,14 @@ package utils
 import (
 	"sync"
 
-	"example.com/internal/auth"
+	"example.com/internal/handler"
 	"example.com/internal/jwt"
 	"example.com/internal/user"
 )
 
 type Handlers struct {
-	Auth auth.Handler
+	Core handler.CoreHandler
+	Auth handler.AuthHandler
 }
 
 var (
@@ -26,9 +27,11 @@ func GetHandlers() *Handlers {
 		jwtService := jwt.NewService(GolangJWTRepo)
 		userService := user.NewService(userSQLRepo)
 
-		authHandler := auth.NewHandler(jwtService, userService)
+		coreHandler := handler.NewCoreHandler()
+		authHandler := handler.NewAuthHandler(jwtService, userService)
 
 		handlers = &Handlers{
+			Core: coreHandler,
 			Auth: authHandler,
 		}
 	})
