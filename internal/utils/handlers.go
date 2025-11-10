@@ -5,12 +5,14 @@ import (
 
 	"example.com/internal/handler"
 	"example.com/internal/jwt"
+	"example.com/internal/product"
 	"example.com/internal/user"
 )
 
 type Handlers struct {
-	Core handler.CoreHandler
-	Auth handler.AuthHandler
+	Core    handler.CoreHandler
+	Auth    handler.AuthHandler
+	Product handler.ProductHandler
 }
 
 var (
@@ -21,18 +23,22 @@ var (
 // GetHandlers initializes and returns all the handlers
 func GetHandlers() *Handlers {
 	handlersOnce.Do(func() {
-		GolangJWTRepo := jwt.NewJWTRepository()
+		jwtRepo := jwt.NewJWTRepository()
 		userSQLRepo := user.NewSQLRepository()
+		productSQLRepo := product.NewSQLRepository()
 
-		jwtService := jwt.NewService(GolangJWTRepo)
+		jwtService := jwt.NewService(jwtRepo)
 		userService := user.NewService(userSQLRepo)
+		productService := product.NewService(productSQLRepo)
 
 		coreHandler := handler.NewCoreHandler()
 		authHandler := handler.NewAuthHandler(jwtService, userService)
+		productHandler := handler.NewProductHandler(productService)
 
 		handlers = &Handlers{
-			Core: coreHandler,
-			Auth: authHandler,
+			Core:    coreHandler,
+			Auth:    authHandler,
+			Product: productHandler,
 		}
 	})
 	return handlers

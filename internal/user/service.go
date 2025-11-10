@@ -1,7 +1,10 @@
 package user
 
 type Service interface {
+	// Create creates a new user
 	Create(cu *CreateUser) (*User, error)
+
+	// UserToDTO converts User model to UserDTO model
 	UserToDTO(u *User) UserDTO
 }
 
@@ -15,12 +18,10 @@ func NewService(repo Repository) Service {
 	}
 }
 
-// Create a new user
 func (s *service) Create(cu *CreateUser) (*User, error) {
 	return s.repo.Create(cu)
 }
 
-// Convert User model to UserDTO model
 func (s *service) UserToDTO(u *User) UserDTO {
 	return UserDTO{
 		ID:       u.ID,

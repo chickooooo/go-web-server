@@ -1,8 +1,15 @@
 package jwt
 
 type Service interface {
+	// NewTokens generate and returns new JWT token pair
 	NewTokens(td *TokenData) (*JWTTokens, error)
+
+	// VerifyToken verifies the given tokenStr. Returns the encoded token data.
+	// tokenType can be 'access' or 'refresh'
 	VerifyToken(tokenStr string, tokenType string) (*TokenData, error)
+
+	// RefreshTokens validates the given refreshToken.
+	// If the token is valid, it returns a new JWT token pair
 	RefreshTokens(refreshToken string) (*JWTTokens, error)
 }
 
@@ -16,19 +23,14 @@ func NewService(repo Repository) Service {
 	}
 }
 
-// NewTokens generate and returns new JWT token pair
 func (s *service) NewTokens(td *TokenData) (*JWTTokens, error) {
 	return s.repo.NewTokens(td)
 }
 
-// VerifyToken verifies the given tokenStr. Returns the encoded token data
-// tokenType can be 'access' or 'refresh'
 func (s *service) VerifyToken(tokenStr string, tokenType string) (*TokenData, error) {
 	return s.repo.VerifyToken(tokenStr, tokenType)
 }
 
-// RefreshTokens validates the given refreshToken.
-// If the token is valid, it returns a new JWT token pair
 func (s *service) RefreshTokens(refreshToken string) (*JWTTokens, error) {
 	// Verify refresh token
 	tokenData, err := s.repo.VerifyToken(refreshToken, "refresh")

@@ -10,7 +10,10 @@ import (
 )
 
 type AuthHandler interface {
+	// Register creates a new user, generate JWT tokens for that user and returns them
 	Register(w http.ResponseWriter, r *http.Request)
+
+	// RefreshTokens refresh JWT tokens for that user and returns them
 	RefreshTokens(w http.ResponseWriter, r *http.Request)
 }
 
@@ -26,7 +29,6 @@ func NewAuthHandler(jwtService jwt.Service, userService user.Service) AuthHandle
 	}
 }
 
-// Register creates a new user, generate JWT tokens for that user and returns them
 func (h authHandler) Register(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var cu user.CreateUser
@@ -80,7 +82,6 @@ func (h authHandler) Register(w http.ResponseWriter, r *http.Request) {
 	core.WriteJSON(w, http.StatusCreated, tokens)
 }
 
-// RefreshTokens refresh JWT tokens for that user and returns them
 func (h authHandler) RefreshTokens(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var requestBody struct {
