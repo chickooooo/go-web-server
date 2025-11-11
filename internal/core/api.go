@@ -2,7 +2,7 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -16,7 +16,7 @@ func WriteJSON(w http.ResponseWriter, status int, data any) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		// Log error
-		fmt.Printf("Error while encoding to JSON. Data: %+v. Error: %v.\n", data, err)
+		log.Printf("Error while encoding to JSON. Data: %+v. Error: %v.\n", data, err)
 
 		// Set error headers and send generic error
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
